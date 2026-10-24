@@ -162,4 +162,14 @@ CONST
     fileNotFound* = "cannot find file: '{0}' in {1}";
     sourceFile* = "File {0}{1}{0}";
 
+    (* Runtime diagnostics. *)
+    runtimeCannotCast* = "cannot cast";
+    runtimeCastTypes* = " to '";
+    runtimeCastFrom* = "' from '";
+    runtimeIndex* = "index out of bounds: ";
+    runtimeSetBit* = "integers between 0 and 31 expected, got ";
+    runtimeSetRange* = "invalid SET diapason: ";
+    runtimeAssertion* = "assertion failed";
+    runtimeKey* = "invalid key: ";
+
 END Message.

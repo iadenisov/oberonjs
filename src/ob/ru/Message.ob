@@ -162,4 +162,14 @@ CONST
     fileNotFound* = "не удалось найти файл: '{0}' в {1}";
     sourceFile* = "Файл {0}{1}{0}";
 
+    (* Runtime diagnostics. *)
+    runtimeCannotCast* = "невозможно выполнить приведение типа";
+    runtimeCastTypes* = " к '";
+    runtimeCastFrom* = "' из '";
+    runtimeIndex* = "индекс за границей: ";
+    runtimeSetBit* = "ожидается целое число от 0 до 31, получено ";
+    runtimeSetRange* = "недопустимый диапазон SET: ";
+    runtimeAssertion* = "нарушено условие ASSERT";
+    runtimeKey* = "недопустимый ключ: ";
+
 END Message.
