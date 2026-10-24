@@ -23,6 +23,17 @@ var cases = [
      'line 1: expected ":" after "?" in ternary operator',
      'строка 1: ожидается ":" после "?" в условном выражении']
 ];
+[oberon, eberon].forEach(function(language){
+    cases.push([language,
+        "MODULE Init;\n\n\n\nPROCEDURE Do;\n VAR a: ARRAY 1 OF INTEGER;\nBEGIN\n a[0] := 1\n INC(a[0]);\nEND Do;\nBEGIN Do END Init.",
+        "line 9: ';' expected", "строка 9: ожидается ';'"]);
+    ["IF TRUE THEN END", "WHILE FALSE DO END", "REPEAT UNTIL TRUE",
+     "FOR i := 0 TO 1 DO END", "CASE i OF 0: END"].forEach(function(statement){
+        cases.push([language,
+            "MODULE m; VAR i: INTEGER; BEGIN i := 1\n" + statement + " END m.",
+            "line 2: ';' expected", "строка 2: ожидается ';'"]);
+    });
+});
 cases.forEach(function(test){
     var errors = [];
     oc.compile(new oc.ReadModule(test[1], "example.ob"), test[0], function(e){errors.push(e);});

@@ -13,6 +13,7 @@ var ContextProcedure = require("js/ContextProcedure.js");
 var ContextType = require("js/ContextType.js");
 var Lexer = require("js/Lexer.js");
 var Parser = require("parser.js");
+var Stream = require("js/Stream.js");
 
 var literal = Parser.literal;
 var point = Lexer.point;
@@ -120,7 +121,20 @@ var assignment = and(context(or(":=", "="), ContextAssignment.Check),
 
 // break recursive declaration of statement
 var forwardStatement = function(stream, context){return statement(stream, context);};
-var statementSequence = and(forwardStatement, repeat(and(";", forwardStatement)));
+var statementStart = or("IF", "CASE", "WHILE", "REPEAT", "FOR", ident);
+var statementSequence = and(forwardStatement, repeat(and(";", forwardStatement)),
+    function(stream, cx){
+        // Look ahead without resolving identifiers or emitting code.
+        var pos = Stream.pos(stream);
+        var startsStatement = statementStart(stream, {
+            handleIdent: function(){},
+            handleLiteral: function(){}
+        });
+        Stream.setPos(stream, pos);
+        if (startsStatement)
+            return required(";")(stream, cx);
+        return true;
+    });
 
 var ifStatement = and("IF", context(and(expression, required("THEN", Message.thenExpected), statementSequence,
                                         repeat(and("ELSIF", expression, required("THEN", Message.thenExpected), statementSequence)),
