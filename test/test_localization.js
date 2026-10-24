@@ -24,6 +24,19 @@ var cases = [
      'строка 1: ожидается ":" после "?" в условном выражении']
 ];
 [oberon, eberon].forEach(function(language){
+    [
+        "MODULE m;\nIMPORT JS\nBEGIN END m.",
+        "MODULE m;\nIMPORT Native := JS\nCONST n = 1; END m.",
+        "MODULE m;\nCONST n = 1\nBEGIN END m.",
+        "MODULE m;\nCONST n = 1\nother = 2; END m.",
+        "MODULE m;\nVAR n: INTEGER\nBEGIN END m.",
+        "MODULE m;\nVAR n: INTEGER\nother: INTEGER; END m.",
+        "MODULE m; PROCEDURE p;\nCONST n = 1\nVAR i: INTEGER; END p; END m.",
+        "MODULE m; PROCEDURE p;\nVAR n: INTEGER\nBEGIN END p; END m."
+    ].forEach(function(source){
+        cases.push([language, source,
+            "line 3: ';' expected", "строка 3: ожидается ';'"]);
+    });
     cases.push([language,
         "MODULE Init;\n\n\n\nPROCEDURE Do;\n VAR a: ARRAY 1 OF INTEGER;\nBEGIN\n a[0] := 1\n INC(a[0]);\nEND Do;\nBEGIN Do END Init.",
         "line 9: ';' expected", "строка 9: ожидается ';'"]);

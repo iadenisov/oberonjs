@@ -242,7 +242,7 @@ result.procedureBody
           required("END", Message.endProcedureExpected));
 result.module
     = context(and("MODULE", ident, ";",
-                  context(optional(and(importList, ";")), ContextModule.Import),
+                  context(optional(and(importList, required(";"))), ContextModule.Import),
                   result.declarationSequence,
                   optional(and("BEGIN", statementSequence)),
                   required("END", Message.endModuleExpected), ident, point),
