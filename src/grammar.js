@@ -1,5 +1,7 @@
 "use strict";
 
+var Message = require("js/Message.js");
+
 var ContextAssignment = require("js/ContextAssignment.js");
 var ContextCase = require("js/ContextCase.js");
 var ContextDesignator = require("js/ContextDesignator.js");
@@ -89,7 +91,7 @@ var factor = context(
        function(stream, context){return set(stream, context);}, // break recursive declaration of set
        designator.factor,
        and("(", function(stream, context){return expression(stream, context);}
-         , required(")", "no matched ')'")),
+         , required(")", Message.unmatchedParen)),
        and("~", function(stream, context){
                     return factor(stream, context);}) // break recursive declaration of factor
      )
@@ -97,14 +99,14 @@ var factor = context(
 
 var addOperator = context(or("+", "-", "OR"), ContextExpression.AddOperator);
 var mulOperator = context(or("*", "/", "DIV", "MOD", "&"), ContextExpression.MulOperator);
-var term = context(and(factor, repeat(and(mulOperator, required(factor, "invalid operand")))), ContextExpression.Term);
+var term = context(and(factor, repeat(and(mulOperator, required(factor, Message.invalidOperand)))), ContextExpression.Term);
 var simpleExpression = context(
         and(optional(or("+", "-"))
           , term
-          , repeat(and(addOperator, required(term, "invalid operand"))))
+          , repeat(and(addOperator, required(term, Message.invalidOperand))))
       , ContextExpression.SimpleExpression);
 var relation = or("=", "#", "<=", "<", ">=", ">", "IN", "IS");
-var expression = makeExpression(and(simpleExpression, optional(and(relation, required(simpleExpression, "invalid operand")))));
+var expression = makeExpression(and(simpleExpression, optional(and(relation, required(simpleExpression, Message.invalidOperand)))));
 var constExpression = expression;
 
 var set = makeSet(expression);
@@ -113,14 +115,14 @@ var expList = and(expression, repeat(and(",", expression)));
 var actualParameters = and("(", context(optional(expList), ContextDesignator.ActualParameters), ")");
 
 var assignment = and(context(or(":=", "="), ContextAssignment.Check),
-                     required(expression, "expression expected"));
+                     required(expression, Message.expressionRequired));
 
 // break recursive declaration of statement
 var forwardStatement = function(stream, context){return statement(stream, context);};
 var statementSequence = and(forwardStatement, repeat(and(";", forwardStatement)));
 
-var ifStatement = and("IF", context(and(expression, required("THEN", "THEN expected"), statementSequence,
-                                        repeat(and("ELSIF", expression, required("THEN", "THEN expected"), statementSequence)),
+var ifStatement = and("IF", context(and(expression, required("THEN", Message.thenExpected), statementSequence,
+                                        repeat(and("ELSIF", expression, required("THEN", Message.thenExpected), statementSequence)),
                                         optional(and("ELSE", statementSequence)),
                                         "END"), 
                                     contexts.If));
@@ -148,7 +150,7 @@ var forStatement = and("FOR",
                        context(and(makeForInit(ident, expression, assignment), "TO", expression
                                  , optional(and("BY", constExpression))
                                  , emit("DO", ContextLoop.emitForBegin)
-                                 , statementSequence, required("END", "END expected (FOR)"))
+                                 , statementSequence, required("END", Message.endForExpected))
                              , contexts.For));
 
 var statement = optional(
@@ -222,13 +224,13 @@ result.procedureBody
     = and(result.declarationSequence,
           optional(and("BEGIN", statementSequence)),
           optional(context(makeReturn(and("RETURN", expression)), ContextProcedure.Return)),
-          required("END", "END expected (PROCEDURE)"));
+          required("END", Message.endProcedureExpected));
 result.module
     = context(and("MODULE", ident, ";",
                   context(optional(and(importList, ";")), ContextModule.Import),
                   result.declarationSequence,
                   optional(and("BEGIN", statementSequence)),
-                  required("END", "END expected (MODULE)"), ident, point),
+                  required("END", Message.endModuleExpected), ident, point),
               contexts.ModuleDeclaration);
 return result;
 }
