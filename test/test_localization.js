@@ -7,6 +7,10 @@ var oberon = require("oberon/oberon_grammar.js").language;
 var eberon = require("eberon/eberon_grammar.js").language;
 var ru = process.argv[2] === "ru";
 var cases = [
+    [oberon, 'MODULE test;\nIMPORT JS;\nBEGIN\n    JS.alert("Hello, World!"\nEND test.',
+     "line 5: no matched ')'", "строка 5: нет соответствующей закрывающей скобки ')'"],
+    [eberon, 'MODULE test;\nIMPORT JS;\nBEGIN\n    JS.alert("Hello, World!"\nEND test.',
+     "line 5: no matched ')'", "строка 5: нет соответствующей закрывающей скобки ')'"],
     [oberon, "MODULE m;\nBEGIN\n\n- END m.",
      "line 4: END expected (MODULE)", "строка 4: ожидается END для MODULE"],
     [oberon, "MODULE m BEGIN END m.",

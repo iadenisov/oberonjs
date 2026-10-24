@@ -112,7 +112,8 @@ var constExpression = expression;
 var set = makeSet(expression);
 
 var expList = and(expression, repeat(and(",", expression)));
-var actualParameters = and("(", context(optional(expList), ContextDesignator.ActualParameters), ")");
+var actualParameters = and("(", context(optional(expList), ContextDesignator.ActualParameters),
+                           required(")", Message.unmatchedParen));
 
 var assignment = and(context(or(":=", "="), ContextAssignment.Check),
                      required(expression, Message.expressionRequired));
